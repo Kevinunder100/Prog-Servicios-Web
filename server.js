@@ -17,7 +17,8 @@ app.listen(PORT, () => {
     console.log(`server is running ${PORT}`)
 });
 
-app.use(routes.unprotectedRoutes);
+app.use("/api", routes); // Usa 'routes' directamente
+
 
 
 

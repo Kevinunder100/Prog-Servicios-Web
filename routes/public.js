@@ -1,6 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-require('dotenv').config();
 
-const authRouter = require('./api/auth');
-router.use( process.env.BASE_URL, authRouter );
+// Definir rutas públicas
+router.get("/", (req, res) => {
+    res.send("Ruta pública funcionando!");
+});
+
+module.exports = router;
