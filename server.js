@@ -4,7 +4,7 @@ const routes = require('./routes/index');
 require('dotenv').config();
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 //middleware
 app.use(express.json());
@@ -17,8 +17,7 @@ app.listen(PORT, () => {
     console.log(`server is running ${PORT}`)
 });
 
-app.use("/api", routes); // Usa 'routes' directamente
-
+app.use(routes.unprotectedRoutes);
 
 
 
