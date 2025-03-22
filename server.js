@@ -2,12 +2,17 @@ const express = require('express');
 const sequelize = require('./config/databases');
 const routes = require('./routes/index');
 require('dotenv').config();
-const app = express();
+const {loggerMiddleware} = require('./middelwares/loggerMiddleware');
+const limiter = require('./middelwares/rateLimitMIddleware');
+const verifyToken = require('./middelwares/verifyToken');
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 //middleware
 app.use(express.json());
+app.use(loggerMiddleware);
+app.use(limiter);
 
 sequelize.sync()
     .then( () => console.log("DB is ready"))
@@ -18,6 +23,10 @@ app.listen(PORT, () => {
 });
 
 app.use(routes.unprotectedRoutes);
+app.use(verifyToken);
+app.use(routes.protectedRoutes);
+
+
 
 
 

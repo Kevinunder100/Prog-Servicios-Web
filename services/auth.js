@@ -25,15 +25,18 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
+// Generar el JWT
+const token = jwt.sign({ email:email }, process.env.JWT_SECRET, { expiresIn: '1y' });
+
     // Crear el nuevo usuario en la base de datos
     const newUser = await UserModel.create({
       name,
       email,
       password: hashPassword,
+      token,
     });
 
-    // Generar el JWT
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    
 
     return res.status(status.CREATED).json({
       message: "Usuario registrado exitosamente.",
