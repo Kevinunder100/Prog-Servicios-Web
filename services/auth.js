@@ -37,7 +37,6 @@ const token = jwt.sign({ email:email }, process.env.JWT_SECRET, { expiresIn: '1y
     });
 
     
-
     return res.status(status.CREATED).json({
       message: "Usuario registrado exitosamente.",
       user: { name, email },

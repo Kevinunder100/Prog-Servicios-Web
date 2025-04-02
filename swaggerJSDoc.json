@@ -1,0 +1,218 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "API de Usuarios",
+    "description": "API para gestionar usuarios, incluyendo registro, autenticación y CRUD"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Autenticación utilizando token JWT. El token debe enviarse en el encabezado como 'Authorization: Bearer <token>'"
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Registrar un nuevo usuario",
+        "description": "Crear un nuevo usuario en la base de datos y generar un token JWT.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente.",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Campos requeridos faltantes"
+          },
+          "409": {
+            "description": "Conflicto: El correo ya está registrado"
+          },
+          "500": {
+            "description": "Error en el servidor"
+          }
+        },
+        "x-middleware": ["loggerMiddleware", "rateLimitMiddleware"]
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Obtener todos los usuarios",
+        "description": "Recuperar una lista de todos los usuarios.",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "500": {
+            "description": "Error en el servidor"
+          }
+        },
+        "x-middleware": ["loggerMiddleware", "rateLimitMiddleware", "verifyToken"]
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Actualizar un usuario existente",
+        "description": "Actualizar los datos de un usuario por su ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID del usuario"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado exitosamente."
+          },
+          "400": {
+            "description": "Solicitud incorrecta"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error en el servidor"
+          }
+        },
+        "x-middleware": ["loggerMiddleware", "rateLimitMiddleware", "verifyToken"]
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Eliminar un usuario",
+        "description": "Eliminar un usuario existente por su ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID del usuario"
+          }
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado exitosamente."
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "500": {
+            "description": "Error en el servidor"
+          }
+        },
+        "x-middleware": ["loggerMiddleware", "rateLimitMiddleware", "verifyToken"]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID del usuario"
+        },
+        "name": {
+          "type": "string",
+          "description": "Nombre del usuario"
+        },
+        "email": {
+          "type": "string",
+          "description": "Correo electrónico del usuario"
+        },
+        "password": {
+          "type": "string",
+          "description": "Contraseña del usuario (en formato hash)"
+        }
+      },
+      "example": {
+        "id": 1,
+        "name": "Juan Pérez",
+        "email": "juan.perez@example.com",
+        "password": "hashedpassword123"
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Mensaje de la respuesta"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "token": {
+          "type": "string",
+          "description": "Token JWT del usuario"
+        }
+      },
+      "example": {
+        "message": "Usuario registrado exitosamente.",
+        "user": {
+          "id": 1,
+          "name": "Juan Pérez",
+          "email": "juan.perez@example.com",
+          "password": "hashedpassword123"
+        },
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      }
+    }
+  }
+}
